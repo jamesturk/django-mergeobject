@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .models import Person, Number, SSN, Group
-from fkreplace import merge
+from fkreplace import merge, OneToOneConflict
 
 class MergeTests(TestCase):
     def setUp(self):
@@ -44,6 +44,12 @@ class MergeTests(TestCase):
         assert SSN.objects.count() == 1
 
     # TODO: test one2one when there's a conflict
+    def test_one2one_conflict(self):
+        SSN.objects.create(person=self.a, number='1')
+        SSN.objects.create(person=self.b, number='1')
+
+        with self.assertRaises(OneToOneConflict):
+            merge(self.a, self.b)
 
     def test_many2many_simple(self):
         self.g.people.add(self.a)

@@ -1,5 +1,20 @@
+from django.core.exceptions import ObjectDoesNotExist
 
-def merge(from_obj, to_obj):
+
+class MergeException(Exception):
+    pass
+
+
+class OneToOneConflict(MergeException):
+    pass
+
+
+ERROR = 0
+KEEP = 1
+UPDATE = 2
+
+
+def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
     if not isinstance(from_obj, type(to_obj)):
         raise ValueError("both objects must be of the same type")
 
@@ -17,17 +32,17 @@ def merge(from_obj, to_obj):
             try:
                 field = getattr(from_obj, accessor_name)
                 try:
-                    getattr(to_obj, accessor_name)
-                except Exception as e:
+                    to_obj_field = getattr(to_obj, accessor_name)
+                    raise OneToOneConflict("both fields have an attribute set for {}".format(accessor_name))
+                except ObjectDoesNotExist:
                     # doesn't exist, safe to overwrite
                     setattr(field, varname, to_obj)
                     field.save()
-            except Exception as e:
+            except ObjectDoesNotExist:
                 # from_obj one to one isn't set, skip
                 pass
         else:
-            import pdb; pdb.set_trace()
-            raise Exception('unknown code path')
+            raise NotImplementedError('unexpected relation type, please file a bug')
 
     for related in from_obj._meta.get_all_related_many_to_many_objects():
         accessor_name = related.get_accessor_name()
