@@ -12,7 +12,7 @@ class Number(models.Model):
 
 
 class SSN(models.Model):
-    person = models.OneToOneField(Person)
+    person = models.OneToOneField(Person, related_name='ssn')
     number = models.CharField(max_length=10)
 
 
