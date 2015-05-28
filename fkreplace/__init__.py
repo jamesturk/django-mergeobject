@@ -3,16 +3,22 @@ def merge(from_obj, to_obj):
     for related in from_obj._meta.get_all_related_objects():
         accessor_name = related.get_accessor_name()
         varname = related.field.name
-        field = getattr(from_obj, accessor_name)
+
         if related.multiple:
+            field = getattr(from_obj, accessor_name)
             field.all().update(**{varname: to_obj})
         elif related.one_to_one:
             try:
-                getattr(to_obj, accessor_name)
+                field = getattr(from_obj, accessor_name)
+                try:
+                    getattr(to_obj, accessor_name)
+                except Exception as e:
+                    # doesn't exist, safe to overwrite
+                    setattr(field, varname, to_obj)
+                    field.save()
             except Exception as e:
-                # doesn't exist, safe to overwrite
-                setattr(field, varname, to_obj)
-                field.save()
+                # from_obj one to one isn't set, skip
+                pass
         else:
             import pdb; pdb.set_trace()
             raise Exception('unknown code path')
