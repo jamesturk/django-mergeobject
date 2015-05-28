@@ -1,5 +1,5 @@
 from django.test import TestCase
-from tests.models import Person, Number, SSN, Group
+from .models import Person, Number, SSN, Group
 from fkreplace import merge
 
 class MergeTests(TestCase):
