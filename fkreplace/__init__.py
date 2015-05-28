@@ -1,5 +1,8 @@
 
 def merge(from_obj, to_obj):
+    if not isinstance(from_obj, type(to_obj)):
+        raise ValueError("both objects must be of the same type")
+
     for related in from_obj._meta.get_all_related_objects():
         accessor_name = related.get_accessor_name()
         varname = related.field.name

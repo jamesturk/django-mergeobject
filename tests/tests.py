@@ -8,6 +8,10 @@ class MergeTests(TestCase):
         self.b = Person.objects.create(name='bee')
         self.g = Group.objects.create(name='Team Awesome')
 
+    def test_same_class(self):
+        with self.assertRaises(ValueError):
+            merge(self.a, self.g)
+
     def test_fk_simple(self):
         Number.objects.create(person=self.a, number='555-1111')
         Number.objects.create(person=self.a, number='555-1112')
