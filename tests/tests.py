@@ -68,4 +68,4 @@ class MergeTests(TestCase):
         merge(self.a, self.b)
         assert self.a.friends.all().count() == 0
         assert self.b.friends.get().name == f.name
-        assert f.get().name == self.b.name
+        assert f.friends.get().name == self.b.name
