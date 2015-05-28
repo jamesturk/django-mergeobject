@@ -11,7 +11,7 @@ class OneToOneConflict(MergeException):
 
 ERROR = 0
 KEEP = 1
-UPDATE = 2
+DELETE = 2
 
 
 def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
@@ -32,8 +32,18 @@ def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
             try:
                 field = getattr(from_obj, accessor_name)
                 try:
-                    to_obj_field = getattr(to_obj, accessor_name)
-                    raise OneToOneConflict("both fields have an attribute set for {}".format(accessor_name))
+                    to_field = getattr(to_obj, accessor_name)
+                    if one_to_one_conflict == KEEP:
+                        pass    # do nothing
+                    elif one_to_one_conflict == DELETE:
+                        # if null:
+                        #   setattr(to_field, varname, None)
+                        #   to_field.save()
+                        to_field.delete()
+                        setattr(field, varname, to_obj)
+                        field.save()
+                    else:
+                        raise OneToOneConflict("both fields have an attribute set for {}".format(accessor_name))
                 except ObjectDoesNotExist:
                     # doesn't exist, safe to overwrite
                     setattr(field, varname, to_obj)
