@@ -18,4 +18,4 @@ class SSN(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=100)
-    people = models.ManyToManyField(Person)
+    people = models.ManyToManyField(Person, related_name='groups')

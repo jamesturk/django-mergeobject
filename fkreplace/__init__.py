@@ -17,9 +17,12 @@ def merge(from_obj, to_obj):
             import pdb; pdb.set_trace()
             raise Exception('unknown code path')
 
-    for related_m2m in from_obj._meta.get_all_related_many_to_many_objects():
+    for related in from_obj._meta.get_all_related_many_to_many_objects():
         accessor_name = related.get_accessor_name()
-        varname = related.field.name
-
-        #for obj in getattr(from_obj, varname)
-
+        if accessor_name:
+            varname = related.field.name
+            field = getattr(from_obj, accessor_name)
+            if related.many_to_many:
+                for f in field.all():
+                    getattr(f, varname).remove(from_obj)
+                    getattr(f, varname).add(to_obj)

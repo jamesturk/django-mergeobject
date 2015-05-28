@@ -37,3 +37,27 @@ class MergeTests(TestCase):
         c = Person.objects.get(pk=self.c.pk)
         c.ssn.number == 1
         assert SSN.objects.count() == 2
+
+    # TODO: test one2one when there's a conflict
+
+    def test_many2many_simple(self):
+        merge(self.a, self.c)
+        # A's membership in G has been moved to C
+        assert self.g.people.all().count() == 2
+        assert self.a.groups.all().count() == 0
+        assert self.c.groups.all().count() == 1
+
+    def test_many2many_redundant(self):
+        merge(self.a, self.b)
+        # A's membership in G is redundant with B's
+        assert self.g.people.all().count() == 1
+        assert self.a.groups.all().count() == 0
+        assert self.b.groups.all().count() == 1
+
+    def test_many2many_self(self):
+        self.a.friends.add(self.b)
+        merge(self.a, self.c)
+        import pdb; pdb.set_trace()
+        assert self.a.friends.all().count() == 0
+        assert self.b.friends.get().name == self.c
+        assert self.c.friends.get().name == self.b
