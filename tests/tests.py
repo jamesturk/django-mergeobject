@@ -12,6 +12,11 @@ class MergeTests(TestCase):
         with self.assertRaises(ValueError):
             merge(self.a, self.g)
 
+    def test_same_object(self):
+        with self.assertRaises(ValueError):
+            # make sure this doesn't rely on is
+            merge(self.a, Person.objects.get(name=self.a.name))
+
     def test_fk_simple(self):
         Number.objects.create(person=self.a, number='555-1111')
         Number.objects.create(person=self.a, number='555-1112')
