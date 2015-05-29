@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 
 
 class MergeException(Exception):
@@ -25,10 +26,8 @@ def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
         accessor_name = related.get_accessor_name()
         varname = related.field.name
 
-        if related.multiple:
-            field = getattr(from_obj, accessor_name)
-            field.all().update(**{varname: to_obj})
-        elif related.one_to_one:
+        # in Django 1.8 can test for related.one_to_one
+        if isinstance(related.field, models.OneToOneField):
             try:
                 field = getattr(from_obj, accessor_name)
                 try:
@@ -36,14 +35,12 @@ def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
                     if one_to_one_conflict == KEEP:
                         pass    # do nothing
                     elif one_to_one_conflict == DELETE:
-                        # if null:
-                        #   setattr(to_field, varname, None)
-                        #   to_field.save()
                         to_field.delete()
                         setattr(field, varname, to_obj)
                         field.save()
                     else:
-                        raise OneToOneConflict("both fields have an attribute set for {}".format(accessor_name))
+                        raise OneToOneConflict(
+                            "both fields have an attribute set for {}".format(accessor_name))
                 except ObjectDoesNotExist:
                     # doesn't exist, safe to overwrite
                     setattr(field, varname, to_obj)
@@ -51,6 +48,10 @@ def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
             except ObjectDoesNotExist:
                 # from_obj one to one isn't set, skip
                 pass
+        # in Django 1.8 can test for related.multiple
+        elif isinstance(related.field, models.ForeignKey):
+            field = getattr(from_obj, accessor_name)
+            field.all().update(**{varname: to_obj})
         else:
             raise NotImplementedError('unexpected relation type, please file a bug')
 
@@ -63,7 +64,6 @@ def merge(from_obj, to_obj, one_to_one_conflict=ERROR):
             accessor_name = varname
 
         field = getattr(from_obj, accessor_name)
-        if related.many_to_many:
-            for f in field.all():
-                getattr(f, varname).remove(from_obj)
-                getattr(f, varname).add(to_obj)
+        for f in field.all():
+            getattr(f, varname).remove(from_obj)
+            getattr(f, varname).add(to_obj)
