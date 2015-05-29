@@ -1,7 +1,5 @@
 automatically replace foreign keys as part of a merge operation
 
-- currently requires Django 1.8
-- has some pretty serious issues & edge cases
-- raises & catches Exception in weird places
+tested on Django 1.7 and 1.8
 
-in other words, don't use this
+very likely has some unsupported edge cases
