@@ -1,16 +1,16 @@
 from setuptools import setup
 
 setup(
-    name='fkreplace',
+    name='mergeobject',
     version="0.1.0",
-    package_dir={'fkreplace': 'fkreplace'},
-    packages=['fkreplace'],
+    package_dir={'mergeobject': 'mergeobject'},
+    packages=['mergeobject'],
     description='',
     long_description='',
     author='James Turk',
     author_email='james.p.turk@gmail.com',
     license='BSD',
-    url='https://github.com/jamesturk/fkreplace/',
+    url='https://github.com/jamesturk/django-mergeobject/',
     platforms=["any"],
     classifiers=[
         'License :: OSI Approved :: BSD License',

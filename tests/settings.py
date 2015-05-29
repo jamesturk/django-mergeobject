@@ -1,7 +1,6 @@
 SECRET_KEY = 'so-secret'
 
 INSTALLED_APPS = (
-    'fkreplace',
     'tests',
 )
 

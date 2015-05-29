@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .models import Person, Number, SSN, Group
-from fkreplace import merge, OneToOneConflict, KEEP, DELETE
+from mergeobject import merge, OneToOneConflict, KEEP, DELETE
 
 class MergeTests(TestCase):
     def setUp(self):
